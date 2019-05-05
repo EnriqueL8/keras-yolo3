@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
- 
 """
 Class definition of YOLO_v3 style detection model on image and video
 """
@@ -22,7 +21,6 @@ from keras.utils import multi_gpu_model
 sensor_height = 60
 real_height = {"car": 1700}
 focal_length = 20 
-
 class YOLO(object):
     _defaults = {
         # "model_path": 'model_data/ep077-loss64.970-val_loss65.846.h5',
@@ -189,7 +187,7 @@ class YOLO(object):
             right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
             distance = 0.0
             if predicted_class in real_height:
-                distance = (focal_length * real_height[predicted_class] * image.height) / ((bottom - top) * sensor_height) 	
+                distance = (focal_length * real_height[predicted_class] * image.height) / ((bottom - top) * sensor_height)
                 distance = distance/1000
 
             print(distance)
@@ -261,12 +259,12 @@ def detect_video(yolo, video_path, output_path=""):
                     fontScale=0.30, color=(255, 0, 0), thickness=1)
         cv2.namedWindow("result", cv2.WINDOW_NORMAL)
         cv2.imshow("result", result)
-	'''
+        '''
         if isOutput:
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-    
+
     vid.release()
     out.release()
     cv2.destroyAllWindows()

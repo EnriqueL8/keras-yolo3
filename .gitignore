@@ -2,7 +2,6 @@
 *.png
 *.weights
 *.h5
-logs/
 *_test.py
 
 # Byte-compiled / optimized / DLL files
