@@ -18,16 +18,17 @@ from yolo3.utils import letterbox_image
 import os
 from keras.utils import multi_gpu_model
 
+
+# Specific configuration of camera for calculating distance to objects
 sensor_height = 60
-real_height = {"car": 1700}
 focal_length = 20 
+
+# These values are relative to the height in the UK
+real_height = {"car" : 1700, "traffic light" : 500, "pedestrian" : 1670, "cyclist": 1750}
+
 class YOLO(object):
     _defaults = {
-        # "model_path": 'model_data/ep077-loss64.970-val_loss65.846.h5',
-        # "model_path": 'model_data/ep009-loss88.777-val_loss89.150.h5',
         "model_path": '000ep098-loss60.736-val_loss62.252.h5',
-	# "model_path": '003ep043-loss26.187-val_loss26.582.h5',
-	# "model_path": 'model_data/yolo.h5',
         "anchors_path": 'model_data/yolo_anchors.txt',
         "classes_path": 'model_data/deep_drive_classes.txt',
         "score" : 0.5,
@@ -190,14 +191,12 @@ class YOLO(object):
                 distance = (focal_length * real_height[predicted_class] * image.height) / ((bottom - top) * sensor_height)
                 distance = distance/1000
 
-            print(distance)
             label = '{} {:.2f}'.format(predicted_class, score)
             if distance > 0:
                 label = '{} {:.2f} {:.2f}m'.format(predicted_class, score, distance)
             draw = ImageDraw.Draw(image)
             label_size = draw.textsize(label, font)
 
-            print(label, (left, top), (right, bottom))
             if top - label_size[1] >= 0:
                 text_origin = np.array([left, top - label_size[1]])
             else:
@@ -245,7 +244,6 @@ def detect_video(yolo, video_path, output_path=""):
         image = Image.fromarray(frame)
         image = yolo.detect_image(image)
         result = np.asarray(image)
-        '''
         curr_time = timer()
         exec_time = curr_time - prev_time
         prev_time = curr_time
@@ -259,7 +257,9 @@ def detect_video(yolo, video_path, output_path=""):
                     fontScale=0.30, color=(255, 0, 0), thickness=1)
         cv2.namedWindow("result", cv2.WINDOW_NORMAL)
         cv2.imshow("result", result)
-        '''
+        print(fps)
+
+        # Writing the processed image to file
         if isOutput:
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'):
